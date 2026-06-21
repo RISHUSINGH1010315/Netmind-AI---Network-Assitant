@@ -1,4 +1,14 @@
 services:
+  # 0. MongoDB Private Database Service
+  - type: pserv
+    name: mongodb
+    env: docker
+    image: mongo:latest
+    disk:
+      name: mongo-data
+      mountPath: /data/db
+      sizeGB: 1
+
   # 1. Python FastAPI AI Service
   - type: web
     name: netmind-ai-service
@@ -23,7 +33,7 @@ services:
       - key: PORT
         value: 5000
       - key: MONGO_URI
-        sync: false # User can provide MongoDB Atlas URI or Render Managed MongoDB
+        value: mongodb://mongodb:27017/netmind-ai
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
