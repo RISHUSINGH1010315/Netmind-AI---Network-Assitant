@@ -1,0 +1,49 @@
+services:
+  # 1. Python FastAPI AI Service
+  - type: web
+    name: netmind-ai-service
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: ai_service
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  # 2. Node.js Express Backend
+  - type: web
+    name: netmind-backend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false # User can provide MongoDB Atlas URI or Render Managed MongoDB
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: AI_SERVICE_URL
+        fromService:
+          name: netmind-ai-service
+          type: web
+          property: host
+
+  # 3. React Frontend (Static Web Hosting)
+  - type: web
+    name: netmind-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    rootDir: frontend
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: netmind-backend
+          type: web
+          property: host
