@@ -18,7 +18,12 @@ interface AuthState {
 }
 
 // Global Axios configuration
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || ''; // proxy takes care of base urls in development and docker
+// Uses proxy in development/Docker local hostnames; defaults to localhost:5000 when deployed on static servers like GitHub Pages
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || (
+  typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? ''
+    : 'http://localhost:5000'
+);
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   token: null,
