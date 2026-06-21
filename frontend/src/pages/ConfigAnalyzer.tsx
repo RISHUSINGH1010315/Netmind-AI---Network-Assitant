@@ -22,6 +22,21 @@ export default function ConfigAnalyzer() {
   const [error, setError] = useState('');
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  const getSeverityCount = (findings: any[], severityName: string) => {
+    if (!findings) return 0;
+    return findings.filter((f: any) => f.severity?.toLowerCase() === severityName.toLowerCase()).length;
+  };
+
+  const getCategoriesList = (findings: any[]) => {
+    if (!findings) return [];
+    const counts: Record<string, number> = {};
+    findings.forEach((f: any) => {
+      const cat = f.type || 'Config';
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  };
+
   useEffect(() => {
     fetchDevices();
   }, []);
@@ -152,7 +167,7 @@ export default function ConfigAnalyzer() {
             disabled={analyzing}
             className="w-full py-2.5 bg-primary text-white font-bold rounded-lg hover:bg-primary-hover shadow transition-all active:scale-95 disabled:opacity-50"
           >
-            {analyzing ? 'AI Configuration Parsing...' : 'Run Audit Analyzer'}
+            {analyzing ? 'AI Analyzer Analyzing...' : 'Run Audit Analyzer'}
           </button>
         </form>
       </div>
@@ -172,11 +187,23 @@ export default function ConfigAnalyzer() {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-150 flex justify-between items-center">
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-150 flex flex-wrap justify-between items-center gap-4">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">DEVICE IDENTITY</p>
-                <p className="text-sm font-black text-slate-800 mt-0.5">
-                  {result.parsedData?.hostname || 'Generic Target Router'}
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ANALYZER MODE</p>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold mt-1 shadow-sm`} style={{
+                  backgroundColor: result.analyzerMode === 'LOG_ANALYSIS' ? '#eef2ff' : '#e0f2fe',
+                  color: result.analyzerMode === 'LOG_ANALYSIS' ? '#4f46e5' : '#0369a1',
+                  border: `1px solid ${result.analyzerMode === 'LOG_ANALYSIS' ? '#c7d2fe' : '#bae6fd'}`
+                }}>
+                  {result.analyzerMode === 'LOG_ANALYSIS' ? 'LOG_ANALYSIS' : 'CONFIG_AUDIT'}
+                </span>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">TARGET IDENTITY</p>
+                <p className="text-xs font-black text-slate-800 mt-1">
+                  {result.analyzerMode === 'LOG_ANALYSIS' 
+                    ? (result.fileName || 'manual-input.log') 
+                    : (result.parsedData?.hostname || 'Generic Target Router')}
                 </p>
               </div>
               <div className="text-right">
@@ -185,21 +212,152 @@ export default function ConfigAnalyzer() {
               </div>
             </div>
 
+            {/* Log Specific Metric & Summary Panels */}
+            {result.analyzerMode === 'LOG_ANALYSIS' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Confidence and Severity Summary */}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-700">Confidence Score</span>
+                    <span className="text-sm font-extrabold text-indigo-650">{result.confidenceScore || 95}%</span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2">
+                    <div 
+                      className="bg-indigo-600 h-2 rounded-full transition-all duration-500" 
+                      style={{ width: `${result.confidenceScore || 95}%` }}
+                    ></div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Severity Summary</span>
+                    <div className="grid grid-cols-5 gap-1.5 text-center">
+                      <div className="bg-red-50 border border-red-100 rounded p-1">
+                        <p className="text-[9px] font-bold text-red-500">Critical</p>
+                        <p className="text-xs font-extrabold text-red-700">{getSeverityCount(result.findings, 'critical')}</p>
+                      </div>
+                      <div className="bg-amber-50 border border-amber-100 rounded p-1">
+                        <p className="text-[9px] font-bold text-amber-500">High</p>
+                        <p className="text-xs font-extrabold text-amber-700">{getSeverityCount(result.findings, 'high')}</p>
+                      </div>
+                      <div className="bg-orange-50 border border-orange-100 rounded p-1">
+                        <p className="text-[9px] font-bold text-orange-500">Medium</p>
+                        <p className="text-xs font-extrabold text-orange-700">{getSeverityCount(result.findings, 'medium')}</p>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-100 rounded p-1">
+                        <p className="text-[9px] font-bold text-blue-500">Low</p>
+                        <p className="text-xs font-extrabold text-blue-700">{getSeverityCount(result.findings, 'low')}</p>
+                      </div>
+                      <div className="bg-teal-50 border border-teal-100 rounded p-1">
+                        <p className="text-[9px] font-bold text-teal-500">Info</p>
+                        <p className="text-xs font-extrabold text-teal-700">{getSeverityCount(result.findings, 'info')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category Summary */}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Category Summary</span>
+                  <div className="space-y-1.5 max-h-[110px] overflow-y-auto pr-1">
+                    {getCategoriesList(result.findings).map(([cat, count]: any) => (
+                      <div key={cat} className="flex justify-between items-center text-xs text-slate-600">
+                        <span className="font-semibold">{cat}</span>
+                        <span className="bg-slate-200 px-2 py-0.5 rounded-full text-[10px] font-bold text-slate-700">{count}</span>
+                      </div>
+                    ))}
+                    {getCategoriesList(result.findings).length === 0 && (
+                      <p className="text-[10px] text-slate-400">No categories recorded</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Root Causes and AI Recommendations */}
+            {result.analyzerMode === 'LOG_ANALYSIS' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Root Cause Analysis */}
+                <div className="bg-amber-50/55 border border-amber-250 rounded-xl p-4 space-y-2" style={{ backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
+                  <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Probable Root Cause Analysis</span>
+                  <div className="space-y-1">
+                    {result.rootCauses && result.rootCauses.length > 0 ? (
+                      result.rootCauses.map((rc: string, idx: number) => (
+                        <div key={idx} className="flex items-center space-x-2 text-xs text-slate-700 font-semibold bg-white border border-amber-100 p-2 rounded-lg">
+                          <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                          <span>{rc}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[10px] text-slate-500 italic">No definite root cause identified from logs.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* AI Recommendations */}
+                <div className="bg-indigo-50/45 border border-indigo-250 rounded-xl p-4 space-y-2" style={{ backgroundColor: '#eef2ff60', borderColor: '#c7d2fe' }}>
+                  <span className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider block">AI Remediation Recommendations</span>
+                  <div className="text-xs text-slate-700 max-h-[140px] overflow-y-auto leading-relaxed pr-1 font-sans">
+                    {result.aiRecommendations ? (
+                      result.aiRecommendations.split('\n').map((para: string, idx: number) => {
+                        if (para.trim().startsWith('-')) {
+                          return (
+                            <li key={idx} className="list-none flex items-start space-x-1.5 py-0.5">
+                              <span className="text-indigo-600 mt-1 font-bold">•</span>
+                              <span>{para.replace(/^-\s*/, '')}</span>
+                            </li>
+                          );
+                        }
+                        return <p key={idx} className="mb-1">{para}</p>;
+                      })
+                    ) : (
+                      <p className="text-[10px] text-slate-500 italic">No specific remediation steps found.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
               {result.findings?.map((finding: any, idx: number) => (
                 <div key={idx} className="p-4 border border-slate-200 rounded-xl space-y-3 shadow-sm hover:shadow-md transition-shadow">
                   {/* Category and Severity Banner */}
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-primary bg-sky-50 px-2 py-0.5 rounded uppercase">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase`} style={{
+                      backgroundColor: result.analyzerMode === 'LOG_ANALYSIS' ? '#eef2ff' : '#f0f9ff',
+                      color: result.analyzerMode === 'LOG_ANALYSIS' ? '#4f46e5' : '#0369a1',
+                      border: `1px solid ${result.analyzerMode === 'LOG_ANALYSIS' ? '#e0e7ff' : '#e0f2fe'}`
+                    }}>
                       {finding.type || 'Config'}
                     </span>
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase ${
-                      finding.severity === 'Critical' 
-                        ? 'bg-red-50 text-red-600' 
-                        : finding.severity === 'Warning' 
-                          ? 'bg-orange-50 text-orange-600' 
-                          : 'bg-blue-50 text-blue-600'
-                    }`}>
+                    <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase border`} style={{
+                      backgroundColor: finding.severity?.toLowerCase() === 'critical' 
+                        ? '#fef2f2' 
+                        : finding.severity?.toLowerCase() === 'high' 
+                          ? '#fffbeb' 
+                          : finding.severity?.toLowerCase() === 'medium' 
+                            ? '#fff7ed' 
+                            : finding.severity?.toLowerCase() === 'low' 
+                              ? '#eff6ff' 
+                              : '#f0fdf4',
+                      color: finding.severity?.toLowerCase() === 'critical' 
+                        ? '#dc2626' 
+                        : finding.severity?.toLowerCase() === 'high' 
+                          ? '#d97706' 
+                          : finding.severity?.toLowerCase() === 'medium' 
+                            ? '#ea580c' 
+                            : finding.severity?.toLowerCase() === 'low' 
+                              ? '#2563eb' 
+                              : '#0d9488',
+                      borderColor: finding.severity?.toLowerCase() === 'critical' 
+                        ? '#fee2e2' 
+                        : finding.severity?.toLowerCase() === 'high' 
+                          ? '#fef3c7' 
+                          : finding.severity?.toLowerCase() === 'medium' 
+                            ? '#ffedd5' 
+                            : finding.severity?.toLowerCase() === 'low' 
+                              ? '#dbeafe' 
+                              : '#dcfce7'
+                    }}>
                       {finding.severity}
                     </span>
                   </div>

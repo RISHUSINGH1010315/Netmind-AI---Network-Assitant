@@ -146,3 +146,171 @@ class NetworkRulesEngine:
             })
 
         return findings
+
+
+class LogRulesEngine:
+    @staticmethod
+    def analyze(content: str) -> dict:
+        findings = []
+        root_causes = []
+        categories = set()
+        
+        lines = content.splitlines()
+        for line in lines:
+            line_lower = line.lower()
+            
+            # WAN Down
+            if "wan down" in line_lower:
+                findings.append({
+                    "type": "Connectivity",
+                    "issue": "WAN Down",
+                    "severity": "CRITICAL",
+                    "impact": "Internet connectivity unavailable",
+                    "explanation": "WAN interface transitioned to down or lost link connection.",
+                    "suggestedFix": "Verify ISP status and WAN interface",
+                    "cliCommand": "interface GigabitEthernet0/0\n no shutdown"
+                })
+                root_causes.append("ISP Outage")
+                categories.add("Connectivity")
+                
+            # Packet Loss
+            elif "packet loss" in line_lower:
+                findings.append({
+                    "type": "Performance",
+                    "issue": "Packet Loss",
+                    "severity": "HIGH",
+                    "impact": "Degraded packet delivery and increased latency",
+                    "explanation": "Link reporting packet drops above acceptable thresholds.",
+                    "suggestedFix": "Check congestion and interface errors",
+                    "cliCommand": "show interfaces summary"
+                })
+                categories.add("Performance")
+                
+            # DNS Timeout
+            elif "dns timeout" in line_lower:
+                findings.append({
+                    "type": "DNS",
+                    "issue": "DNS Timeout",
+                    "severity": "HIGH",
+                    "impact": "Domain name resolution failures for clients",
+                    "explanation": "DNS queries to primary server timed out.",
+                    "suggestedFix": "Verify DNS server health and reachability",
+                    "cliCommand": "ping 8.8.8.8"
+                })
+                root_causes.append("DNS Failure")
+                categories.add("DNS")
+                
+            # SSH Brute Force
+            elif "ssh brute force" in line_lower or "brute force" in line_lower:
+                findings.append({
+                    "type": "Security",
+                    "issue": "SSH Brute Force Attack",
+                    "severity": "CRITICAL",
+                    "impact": "Potential unauthorized administrative access",
+                    "explanation": "Detected abnormal frequency of failed administrative login attempts.",
+                    "suggestedFix": "Block source IP and enable rate limiting",
+                    "cliCommand": "ip access-list standard BLOCK_IP\n deny 192.168.1.50\n permit any"
+                })
+                root_causes.append("Brute Force Attack")
+                categories.add("Security")
+                
+            # Broadcast Storm
+            elif "broadcast storm" in line_lower:
+                findings.append({
+                    "type": "Switching",
+                    "issue": "Broadcast Storm",
+                    "severity": "CRITICAL",
+                    "impact": "Extreme network bandwidth saturation",
+                    "explanation": "Broadcast frame traffic rate exceeded port bandwidth limitations.",
+                    "suggestedFix": "Check STP and Layer 2 loops",
+                    "cliCommand": "show spanning-tree summary"
+                })
+                root_causes.append("Layer 2 Loop")
+                categories.add("Switching")
+                
+            # CRC Errors
+            elif "crc errors" in line_lower:
+                findings.append({
+                    "type": "Physical Layer",
+                    "issue": "CRC Errors",
+                    "severity": "MEDIUM",
+                    "impact": "Layer 1 physical link errors",
+                    "explanation": "High rate of Cyclic Redundancy Check failures on the interface.",
+                    "suggestedFix": "Inspect cable and transceiver",
+                    "cliCommand": "show interface status"
+                })
+                categories.add("Physical Layer")
+                
+            # Database connection failure
+            elif "database connection failed" in line_lower or "database failed" in line_lower:
+                findings.append({
+                    "type": "Application",
+                    "issue": "Database Connection Failed",
+                    "severity": "CRITICAL",
+                    "impact": "Operational database unavailable for client transactions",
+                    "explanation": "Express backend server failed to ping database port.",
+                    "suggestedFix": "Check database service and connectivity",
+                    "cliCommand": "telnet localhost 27017"
+                })
+                root_causes.append("Database Outage")
+                categories.add("Application")
+                
+            # High CPU Usage
+            elif "high cpu" in line_lower:
+                findings.append({
+                    "type": "Infrastructure",
+                    "issue": "High CPU Usage",
+                    "severity": "MEDIUM",
+                    "impact": "Control plane responsiveness degradation",
+                    "explanation": "Router/switch CPU utilization exceeded safety threshold.",
+                    "suggestedFix": "Investigate running processes and CPU usage logs",
+                    "cliCommand": "show processes cpu sorted"
+                })
+                categories.add("Infrastructure")
+                
+            # DHCP Lease Assigned
+            elif "dhcp lease" in line_lower:
+                findings.append({
+                    "type": "Connectivity",
+                    "issue": "DHCP Lease Assigned",
+                    "severity": "INFO",
+                    "impact": "Client IP parameters assigned successfully",
+                    "explanation": "IP allocation logged for client interface.",
+                    "suggestedFix": "No action required.",
+                    "cliCommand": ""
+                })
+                categories.add("Connectivity")
+                
+            # User Login Successful
+            elif "user login" in line_lower:
+                findings.append({
+                    "type": "Security",
+                    "issue": "User Login Successful",
+                    "severity": "INFO",
+                    "impact": "Successful operator login session established",
+                    "explanation": "Operator authenticated successfully.",
+                    "suggestedFix": "No action required.",
+                    "cliCommand": ""
+                })
+                categories.add("Security")
+        
+        # Build recommendations
+        recs = []
+        for finding in findings:
+            if finding["suggestedFix"]:
+                recs.append(f"- **{finding['issue']}**: {finding['suggestedFix']}.")
+        ai_recommendations = "\n".join(recs) if recs else "All logs conform to standard operational metrics."
+        
+        # Format unique root causes maintaining ordering
+        unique_root_causes = []
+        for rc in root_causes:
+            if rc not in unique_root_causes:
+                unique_root_causes.append(rc)
+                
+        # Return structured analysis data
+        return {
+            "findings": findings,
+            "root_causes": unique_root_causes,
+            "ai_recommendations": ai_recommendations,
+            "confidence_score": 96 if len(findings) > 0 else 100
+        }

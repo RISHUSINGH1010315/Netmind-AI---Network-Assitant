@@ -6,9 +6,9 @@ const AIFindingSchema = new Schema(
   {
     device: { type: Schema.Types.ObjectId, ref: 'Device', default: null },
     configuration: { type: Schema.Types.ObjectId, ref: 'Configuration', default: null },
-    category: { type: String, enum: ['Config', 'VLAN', 'Routing', 'ACL', 'DHCP', 'DNS', 'Security'], required: true },
+    category: { type: String, required: true },
     issue: { type: String, required: true },
-    severity: { type: String, enum: ['Critical', 'Warning', 'Info'], required: true },
+    severity: { type: String, required: true },
     impact: { type: String, required: true },
     explanation: { type: String, required: true },
     suggestedFix: { type: String, required: true },

@@ -23,39 +23,65 @@ export const uploadConfig = async (req: AuthenticatedRequest, res: Response) => 
     }
 
     const device = deviceId ? await Device.findById(deviceId) : null;
+    const mode = detectFileType(configText);
 
     // Create the initial Configuration document
     const newConfig = new Configuration({
       device: device ? device._id : null,
       fileName,
       rawText: configText,
+      analyzerMode: mode,
       findings: []
     });
 
     let findings: any[] = [];
     let parsedData: any = {};
+    let rootCauses: string[] = [];
+    let aiRecommendations = '';
+    let confidenceScore = 100;
 
-    try {
-      // Forward config to FastAPI
-      const response = await axios.post(`${AI_SERVICE_URL}/api/ai/analyze-config`, {
-        filename: fileName,
-        content: configText
-      });
-      findings = response.data.findings;
-      parsedData = response.data.parsed_data;
-    } catch (err) {
-      // Node.js fallback analyzer
-      findings = analyzeConfigLocally(configText);
-      parsedData = {
-        hostname: configText.match(/hostname\s+(\S+)/i)?.[1] || 'Unknown',
-        interfaces: parseInterfacesLocally(configText),
-        routing: parseRoutingLocally(configText),
-        vlans: parseVlansLocally(configText)
-      };
+    if (mode === 'LOG_ANALYSIS') {
+      try {
+        const response = await axios.post(`${AI_SERVICE_URL}/api/ai/analyze-log-file`, {
+          content: configText
+        });
+        findings = response.data.findings;
+        rootCauses = response.data.root_causes;
+        aiRecommendations = response.data.ai_recommendations;
+        confidenceScore = response.data.confidence_score;
+      } catch (err) {
+        const localLogResult = analyzeLogLocally(configText);
+        findings = localLogResult.findings;
+        rootCauses = localLogResult.rootCauses;
+        aiRecommendations = localLogResult.aiRecommendations;
+        confidenceScore = localLogResult.confidenceScore;
+      }
+    } else {
+      try {
+        // Forward config to FastAPI
+        const response = await axios.post(`${AI_SERVICE_URL}/api/ai/analyze-config`, {
+          filename: fileName,
+          content: configText
+        });
+        findings = response.data.findings;
+        parsedData = response.data.parsed_data;
+      } catch (err) {
+        // Node.js fallback analyzer
+        findings = analyzeConfigLocally(configText);
+        parsedData = {
+          hostname: configText.match(/hostname\s+(\S+)/i)?.[1] || 'Unknown',
+          interfaces: parseInterfacesLocally(configText),
+          routing: parseRoutingLocally(configText),
+          vlans: parseVlansLocally(configText)
+        };
+      }
     }
 
     newConfig.findings = findings as any;
     newConfig.parsedData = parsedData;
+    newConfig.rootCauses = rootCauses;
+    newConfig.aiRecommendations = aiRecommendations;
+    newConfig.confidenceScore = confidenceScore;
     await newConfig.save();
 
     // Map configuration to AIFindings
@@ -276,4 +302,243 @@ function parseVlansLocally(text: string): any[] {
     vlans.push({ id: parseInt(id), name });
   }
   return vlans;
+}
+
+function detectFileType(content: string): 'CONFIG_AUDIT' | 'LOG_ANALYSIS' {
+  const contentLower = content.toLowerCase();
+  
+  // 1. Check for specific log indicators
+  const logKeywords = [
+    '[critical]',
+    '[high]',
+    '[medium]',
+    '[low]',
+    '[info]',
+    'error',
+    'warning',
+    'alert',
+    'critical',
+    '%link-',
+    '%lineproto-',
+    '%sec-',
+    'interface down',
+    'packet loss',
+    'timeout',
+    'brute force',
+    'database failed',
+    'event id',
+    'source:',
+    'level:',
+    'kernel:',
+    'systemd:',
+    'sshd:'
+  ];
+  
+  const hasLogKeywords = logKeywords.some(keyword => contentLower.includes(keyword));
+  
+  // Syslog pattern like "Jun 21 10:10:01" or "Jul 15 12:05:30"
+  const syslogRegex = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}/mi;
+  const hasSyslogPattern = syslogRegex.test(content);
+  
+  if (hasLogKeywords || hasSyslogPattern) {
+    return 'LOG_ANALYSIS';
+  }
+
+  // 2. Check for config indicators
+  const configKeywords = [
+    'hostname',
+    'interface',
+    'router ospf',
+    'router bgp',
+    'ip route',
+    'switchport',
+    'vlan',
+    'line vty',
+    'aaa new-model',
+    'snmp-server',
+    'logging host',
+    'enable secret'
+  ];
+  
+  const hasConfigKeywords = configKeywords.some(keyword => contentLower.includes(keyword));
+  if (hasConfigKeywords) {
+    return 'CONFIG_AUDIT';
+  }
+  
+  return 'CONFIG_AUDIT';
+}
+
+function analyzeLogLocally(content: string): any {
+  const findings: any[] = [];
+  const rootCauses: string[] = [];
+  const categories = new Set<string>();
+  
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const lineLower = line.toLowerCase();
+    
+    // WAN Down
+    if (lineLower.includes('wan down')) {
+      findings.push({
+        type: 'Connectivity',
+        issue: 'WAN Down',
+        severity: 'CRITICAL',
+        impact: 'Internet connectivity unavailable',
+        explanation: 'WAN interface transitioned to down or lost link connection.',
+        suggestedFix: 'Verify ISP status and WAN interface',
+        cliCommand: 'interface GigabitEthernet0/0\n no shutdown'
+      });
+      rootCauses.push('ISP Outage');
+      categories.add('Connectivity');
+    }
+    
+    // Packet Loss
+    else if (lineLower.includes('packet loss')) {
+      findings.push({
+        type: 'Performance',
+        issue: 'Packet Loss',
+        severity: 'HIGH',
+        impact: 'Degraded packet delivery and increased latency',
+        explanation: 'Link reporting packet drops above acceptable thresholds.',
+        suggestedFix: 'Check congestion and interface errors',
+        cliCommand: 'show interfaces summary'
+      });
+      categories.add('Performance');
+    }
+    
+    // DNS Timeout
+    else if (lineLower.includes('dns timeout')) {
+      findings.push({
+        type: 'DNS',
+        issue: 'DNS Timeout',
+        severity: 'HIGH',
+        impact: 'Domain name resolution failures for clients',
+        explanation: 'DNS queries to primary server timed out.',
+        suggestedFix: 'Verify DNS server health and reachability',
+        cliCommand: 'ping 8.8.8.8'
+      });
+      rootCauses.push('DNS Failure');
+      categories.add('DNS');
+    }
+    
+    // SSH Brute Force
+    else if (lineLower.includes('ssh brute force') || lineLower.includes('brute force')) {
+      findings.push({
+        type: 'Security',
+        issue: 'SSH Brute Force Attack',
+        severity: 'CRITICAL',
+        impact: 'Potential unauthorized administrative access',
+        explanation: 'Detected abnormal frequency of failed administrative login attempts.',
+        suggestedFix: 'Block source IP and enable rate limiting',
+        cliCommand: 'ip access-list standard BLOCK_IP\n deny 192.168.1.50\n permit any'
+      });
+      rootCauses.push('Brute Force Attack');
+      categories.add('Security');
+    }
+    
+    // Broadcast Storm
+    else if (lineLower.includes('broadcast storm')) {
+      findings.push({
+        type: 'Switching',
+        issue: 'Broadcast Storm',
+        severity: 'CRITICAL',
+        impact: 'Extreme network bandwidth saturation',
+        explanation: 'Broadcast frame traffic rate exceeded port bandwidth limitations.',
+        suggestedFix: 'Check STP and Layer 2 loops',
+        cliCommand: 'show spanning-tree summary'
+      });
+      rootCauses.push('Layer 2 Loop');
+      categories.add('Switching');
+    }
+    
+    // CRC Errors
+    else if (lineLower.includes('crc errors')) {
+      findings.push({
+        type: 'Physical Layer',
+        issue: 'CRC Errors',
+        severity: 'MEDIUM',
+        impact: 'Layer 1 physical link errors',
+        explanation: 'High rate of Cyclic Redundancy Check failures on the interface.',
+        suggestedFix: 'Inspect cable and transceiver',
+        cliCommand: 'show interface status'
+      });
+      categories.add('Physical Layer');
+    }
+    
+    // Database connection failure
+    else if (lineLower.includes('database connection failed') || lineLower.includes('database failed')) {
+      findings.push({
+        type: 'Application',
+        issue: 'Database Connection Failed',
+        severity: 'CRITICAL',
+        impact: 'Operational database unavailable for client transactions',
+        explanation: 'Express backend server failed to ping database port.',
+        suggestedFix: 'Check database service and connectivity',
+        cliCommand: 'telnet localhost 27017'
+      });
+      rootCauses.push('Database Outage');
+      categories.add('Application');
+    }
+    
+    // High CPU Usage
+    else if (lineLower.includes('high cpu')) {
+      findings.push({
+        type: 'Infrastructure',
+        issue: 'High CPU Usage',
+        severity: 'MEDIUM',
+        impact: 'Control plane responsiveness degradation',
+        explanation: 'Router/switch CPU utilization exceeded safety threshold.',
+        suggestedFix: 'Investigate running processes and CPU usage logs',
+        cliCommand: 'show processes cpu sorted'
+      });
+      categories.add('Infrastructure');
+    }
+    
+    // DHCP Lease Assigned
+    else if (lineLower.includes('dhcp lease')) {
+      findings.push({
+        type: 'Connectivity',
+        issue: 'DHCP Lease Assigned',
+        severity: 'INFO',
+        impact: 'Client IP parameters assigned successfully',
+        explanation: 'IP allocation logged for client interface.',
+        suggestedFix: 'No action required.',
+        cliCommand: ''
+      });
+      categories.add('Connectivity');
+    }
+    
+    // User Login Successful
+    else if (lineLower.includes('user login')) {
+      findings.push({
+        type: 'Security',
+        issue: 'User Login Successful',
+        severity: 'INFO',
+        impact: 'Successful operator login session established',
+        explanation: 'Operator authenticated successfully.',
+        suggestedFix: 'No action required.',
+        cliCommand: ''
+      });
+      categories.add('Security');
+    }
+  }
+  
+  const recs = findings
+    .filter(f => f.suggestedFix)
+    .map(f => `- **${f.issue}**: ${f.suggestedFix}.`);
+  const aiRecommendations = recs.length > 0 ? recs.join('\n') : 'All logs conform to standard operational metrics.';
+  
+  const uniqueRootCauses: string[] = [];
+  for (const rc of rootCauses) {
+    if (!uniqueRootCauses.includes(rc)) {
+      uniqueRootCauses.push(rc);
+    }
+  }
+  
+  return {
+    findings,
+    rootCauses: uniqueRootCauses,
+    aiRecommendations,
+    confidenceScore: findings.length > 0 ? 96 : 100
+  };
 }

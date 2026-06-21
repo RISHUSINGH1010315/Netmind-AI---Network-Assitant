@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 # Import our helpers
 from parser import NetworkConfigParser
-from rules import NetworkRulesEngine
+from rules import NetworkRulesEngine, LogRulesEngine
 from rag import RAGKnowledgeBase
 
 load_dotenv()
@@ -32,6 +32,9 @@ class ConfigPayload(BaseModel):
 
 class LogPayload(BaseModel):
     raw_log: str
+
+class LogFilePayload(BaseModel):
+    content: str
 
 class ChatPayload(BaseModel):
     session_id: str
@@ -94,6 +97,13 @@ def analyze_log(payload: LogPayload):
             "explanation": explanation,
             "severity": severity
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ai/analyze-log-file")
+def analyze_log_file(payload: LogFilePayload):
+    try:
+        return LogRulesEngine.analyze(payload.content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

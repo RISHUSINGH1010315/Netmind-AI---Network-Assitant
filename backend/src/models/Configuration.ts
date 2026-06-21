@@ -8,6 +8,10 @@ const ConfigurationSchema = new Schema(
     fileName: { type: String, required: true },
     rawText: { type: String, required: true },
     parsedData: { type: Schema.Types.Mixed, default: {} },
+    analyzerMode: { type: String, enum: ['CONFIG_AUDIT', 'LOG_ANALYSIS'], default: 'CONFIG_AUDIT' },
+    rootCauses: { type: [String], default: [] },
+    aiRecommendations: { type: String, default: '' },
+    confidenceScore: { type: Number, default: 100 },
     findings: [
       {
         type: { type: String }, // Config, VLAN, Routing, ACL, DHCP, DNS, Security
