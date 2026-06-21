@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NetMind AI - Log &amp; Incident Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .log-stream-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .log-stream-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#c3c6d6",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#001848",
+                      "on-primary-container": "#c4d2ff",
+                      "on-secondary-fixed": "#0b1c30",
+                      "background": "#f9f9ff",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "secondary-container": "#d0e1fb",
+                      "surface": "#f9f9ff",
+                      "error": "#ba1a1a",
+                      "tertiary": "#404445",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "inverse-surface": "#263143",
+                      "on-surface-variant": "#434654",
+                      "on-surface": "#111c2d",
+                      "on-tertiary-fixed": "#191c1e",
+                      "surface-container-low": "#f0f3ff",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "primary-container": "#0052cc",
+                      "secondary": "#505f76",
+                      "error-container": "#ffdad6",
+                      "surface-container-highest": "#d8e3fb",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "primary": "#003d9b",
+                      "primary-fixed": "#dae2ff",
+                      "surface-container-high": "#dee8ff",
+                      "inverse-on-surface": "#ecf1ff",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container": "#e7eeff",
+                      "surface-dim": "#cfdaf2",
+                      "secondary-fixed": "#d3e4fe",
+                      "inverse-primary": "#b2c5ff",
+                      "outline": "#737685",
+                      "surface-bright": "#f9f9ff",
+                      "on-tertiary-container": "#d1d3d5",
+                      "on-secondary-container": "#54647a",
+                      "on-secondary": "#ffffff",
+                      "on-background": "#111c2d",
+                      "surface-tint": "#0c56d0",
+                      "surface-variant": "#d8e3fb",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#585b5d",
+                      "tertiary-fixed": "#e0e3e5",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "2xl": "48px",
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "base": "4px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "code-sm": ["JetBrains Mono"],
+                      "body-sm": ["Inter"],
+                      "title-md": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "title-md": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen overflow-x-hidden">
+<!-- Shell: SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container shadow-sm flex flex-col border-r border-outline-variant z-50">
+<div class="px-lg py-xl">
+<h1 class="font-headline-lg text-headline-lg font-black text-primary">NetMind AI</h1>
+<p class="text-on-surface-variant text-sm font-medium">Enterprise Core</p>
+</div>
+<nav class="flex-1 px-sm space-y-1 overflow-y-auto">
+<!-- Navigation Items Mapping from JSON -->
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-sm text-body-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-sm text-body-sm">Inventory</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">settings_ethernet</span>
+<span class="font-body-sm text-body-sm">Config Analyzer</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-primary font-bold bg-primary-container/20 border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-body-sm text-body-sm">Logs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">error</span>
+<span class="font-body-sm text-body-sm">Incidents</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">lan</span>
+<span class="font-body-sm text-body-sm">VLANs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">router</span>
+<span class="font-body-sm text-body-sm">Routing</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">security_update_good</span>
+<span class="font-body-sm text-body-sm">ACLs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">security</span>
+<span class="font-body-sm text-body-sm">Security</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-colors hover:bg-surface-container-highest text-on-surface-variant mt-auto" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-body-sm text-body-sm">AI Assistant</span>
+</a>
+</nav>
+<div class="p-md border-t border-outline-variant flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white text-xs font-bold">JD</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-bold truncate">Network Eng. 01</p>
+<p class="text-xs text-on-surface-variant truncate">Global Core Admin</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">logout</span>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="h-16 flex justify-between items-center px-xl py-md bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-40">
+<div class="flex items-center gap-lg">
+<h2 class="font-title-md text-title-md text-primary">Log &amp; Incident Center</h2>
+<div class="flex items-center bg-surface-container rounded-lg px-md py-xs border border-outline-variant focus-within:ring-2 focus-within:ring-primary/20 transition-all w-96">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-outline" placeholder="Search syslogs, incidents, or trace IDs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm px-md py-xs bg-surface-container-high rounded-full">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse-subtle"></span>
+<span class="text-xs font-bold text-on-secondary-container">SLA: 99.998%</span>
+</div>
+<button class="p-sm hover:text-primary transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-sm hover:text-primary transition-all"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-sm hover:text-primary transition-all"><span class="material-symbols-outlined">help_outline</span></button>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-lg flex flex-col gap-lg flex-1">
+<!-- Top Dashboard Stats -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm">
+<p class="text-xs font-label-caps text-on-surface-variant mb-xs">ACTIVE INCIDENTS</p>
+<p class="text-display-lg font-display-lg text-primary">04</p>
+<p class="text-xs text-error mt-xs flex items-center gap-xs font-bold">
+<span class="material-symbols-outlined text-xs">trending_up</span> 2 since last hour
+                    </p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm">
+<p class="text-xs font-label-caps text-on-surface-variant mb-xs">LOG VOLUME (1M)</p>
+<p class="text-display-lg font-display-lg text-on-surface">1.2k</p>
+<p class="text-xs text-on-surface-variant mt-xs font-medium">Nominal baseline reached</p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm">
+<p class="text-xs font-label-caps text-on-surface-variant mb-xs">MEAN TIME TO RESOLVE</p>
+<p class="text-display-lg font-display-lg text-on-surface">14m</p>
+<p class="text-xs text-green-600 mt-xs flex items-center gap-xs font-bold">
+<span class="material-symbols-outlined text-xs">trending_down</span> 12% optimization
+                    </p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between overflow-hidden relative">
+<div class="relative z-10">
+<p class="text-xs font-label-caps text-on-surface-variant mb-xs">CORE UPTIME (SLA)</p>
+<p class="text-display-lg font-display-lg text-primary">99.9%</p>
+<p class="text-xs text-on-surface-variant mt-xs font-medium">Critical Threshold: 99.5%</p>
+</div>
+<div class="absolute right-0 bottom-0 opacity-20 w-32 h-32">
+
+</div>
+</div>
+</div>
+<!-- Main Log & Incident Interface -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg flex-1 min-h-[600px]">
+<!-- Section: Real-Time Log Stream (Left 7 Columns) -->
+<section class="lg:col-span-7 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low/50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<h3 class="font-title-md text-title-md">Real-Time Syslog Stream</h3>
+</div>
+<div class="flex items-center gap-md">
+<label class="flex items-center gap-xs cursor-pointer">
+<input checked="" class="rounded text-primary focus:ring-primary/20 w-4 h-4" type="checkbox"/>
+<span class="text-xs font-bold text-on-surface-variant">Live Feed</span>
+</label>
+<span class="h-4 w-[1px] bg-outline-variant"></span>
+<button class="text-xs font-bold text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-xs">filter_list</span> Filter
+                            </button>
+</div>
+</div>
+<!-- Log Table Header -->
+<div class="grid grid-cols-12 px-lg py-sm bg-surface-container text-[10px] font-black uppercase tracking-wider text-outline border-b border-outline-variant">
+<div class="col-span-1">LEVEL</div>
+<div class="col-span-2">TIMESTAMP</div>
+<div class="col-span-3">SOURCE</div>
+<div class="col-span-6">MESSAGE &amp; AI SUMMARY</div>
+</div>
+<!-- Scrollable Log Content -->
+<div class="flex-1 overflow-y-auto log-stream-container font-code-sm text-code-sm">
+<!-- Log Entry 1: Critical -->
+<div class="grid grid-cols-12 px-lg py-md border-b border-outline-variant hover:bg-surface-container-low transition-colors group">
+<div class="col-span-1 flex items-start pt-1">
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold">CRIT</span>
+</div>
+<div class="col-span-2 text-on-surface-variant">14:22:31.42</div>
+<div class="col-span-3 font-bold">CORE-AGG-01-SJC</div>
+<div class="col-span-6 space-y-md">
+<div class="text-on-surface line-clamp-1 opacity-60">%OSPF-5-ADJCHG: Process 1, Nbr 10.0.4.2 on GigabitEthernet0/1 from FULL to DOWN</div>
+<div class="bg-primary-container/5 p-sm rounded-lg border-l-4 border-primary flex items-start gap-md">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">auto_awesome</span>
+<div>
+<span class="font-bold text-primary block text-xs">AI TRANSLATION:</span>
+<p class="text-on-surface-variant leading-relaxed">OSPF neighbor on Interface Ge0/1 has lost connectivity. This is causing a routing flap between San Jose and Palo Alto clusters.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Log Entry 2: Warning -->
+<div class="grid grid-cols-12 px-lg py-md border-b border-outline-variant hover:bg-surface-container-low transition-colors group">
+<div class="col-span-1 flex items-start pt-1">
+<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">WARN</span>
+</div>
+<div class="col-span-2 text-on-surface-variant">14:22:29.08</div>
+<div class="col-span-3 font-bold">DIST-04-A</div>
+<div class="col-span-6 space-y-md">
+<div class="text-on-surface line-clamp-1 opacity-60">%SNMP-3-AUTH_FAIL: Authentication failure for user 'netmon'</div>
+<div class="bg-primary-container/5 p-sm rounded-lg border-l-4 border-primary flex items-start gap-md">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">auto_awesome</span>
+<div>
+<span class="font-bold text-primary block text-xs">AI TRANSLATION:</span>
+<p class="text-on-surface-variant leading-relaxed">External monitoring tool 'netmon' is using expired credentials. Check the secret vault for rotation status.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Log Entry 3: Info -->
+<div class="grid grid-cols-12 px-lg py-md border-b border-outline-variant hover:bg-surface-container-low transition-colors group">
+<div class="col-span-1 flex items-start pt-1">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold">INFO</span>
+</div>
+<div class="col-span-2 text-on-surface-variant">14:21:55.12</div>
+<div class="col-span-3 font-bold">FW-CORE-EDGE-01</div>
+<div class="col-span-6 space-y-md">
+<div class="text-on-surface line-clamp-1 opacity-60">Rule 402 Accepted: TCP 192.168.4.1:443 -&gt; 10.0.0.22:52414</div>
+<div class="text-on-surface-variant italic opacity-50">Standard flow telemetry...</div>
+</div>
+</div>
+<!-- Log Entry 4: Error -->
+<div class="grid grid-cols-12 px-lg py-md border-b border-outline-variant hover:bg-surface-container-low transition-colors group">
+<div class="col-span-1 flex items-start pt-1">
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold">ERR</span>
+</div>
+<div class="col-span-2 text-on-surface-variant">14:21:40.33</div>
+<div class="col-span-3 font-bold">CORE-AGG-01-SJC</div>
+<div class="col-span-6 space-y-md">
+<div class="text-on-surface line-clamp-1 opacity-60">Memory utilization threshold exceeded (92.4%)</div>
+<div class="bg-primary-container/5 p-sm rounded-lg border-l-4 border-primary flex items-start gap-md">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">auto_awesome</span>
+<div>
+<span class="font-bold text-primary block text-xs">AI TRANSLATION:</span>
+<p class="text-on-surface-variant leading-relaxed">Severe memory pressure detected. Likely correlated with the high volume of BGP route updates received in the last 2 minutes.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Console Interaction -->
+<div class="p-md bg-surface-container border-t border-outline-variant flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">terminal</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm flex-1 font-code-sm" placeholder="Run AI command (e.g., 'summarize all OSPF logs in the last 10m')..." type="text"/>
+<button class="bg-primary text-white px-md py-sm rounded-lg font-bold text-xs">EXECUTE</button>
+</div>
+</section>
+<!-- Section: Incident Tracker & Root Cause (Right 5 Columns) -->
+<aside class="lg:col-span-5 flex flex-col gap-lg">
+<!-- Root Cause Analysis Card -->
+<div class="bg-primary-container p-[1px] rounded-xl shadow-lg">
+<div class="bg-surface-container-lowest rounded-[11px] overflow-hidden p-lg">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="p-xs bg-primary/10 rounded">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<h3 class="font-title-md text-title-md text-primary">Root Cause Correlation</h3>
+</div>
+<span class="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">AI CONFIDENCE: 94%</span>
+</div>
+<div class="mb-lg">
+<h4 class="font-bold text-on-surface mb-xs">Incident ID: INC-2024-0082</h4>
+<p class="text-sm text-on-surface-variant">OSPF Neighbor Flap &amp; Core Latency Spike</p>
+</div>
+<div class="space-y-md relative">
+<!-- Connection Lines -->
+<div class="absolute left-[7px] top-4 bottom-4 w-0.5 bg-outline-variant"></div>
+<div class="flex items-start gap-md relative">
+<div class="w-4 h-4 rounded-full bg-primary border-2 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1 bg-surface-container p-sm rounded-lg border border-outline-variant">
+<p class="text-xs font-bold text-on-surface-variant">SYSLOG: CORE-AGG-01-SJC</p>
+<p class="text-[11px] font-code-sm">%OSPF-5-ADJCHG: DOWN</p>
+</div>
+</div>
+<div class="flex items-start gap-md relative">
+<div class="w-4 h-4 rounded-full bg-primary border-2 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1 bg-surface-container p-sm rounded-lg border border-outline-variant">
+<p class="text-xs font-bold text-on-surface-variant">TELEMETRY: SJC-CLUSTER</p>
+<p class="text-[11px] font-code-sm">CPU Spike: 98% (Agg-Switch)</p>
+</div>
+</div>
+<div class="flex items-start gap-md relative">
+<div class="w-4 h-4 rounded-full bg-error border-2 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1 bg-error-container p-sm rounded-lg border border-error/20">
+<p class="text-xs font-bold text-error">ROOT CAUSE IDENTIFIED</p>
+<p class="text-[11px] font-medium text-on-error-container">Misconfigured MTU on peer interface (1500 vs 9000 jumbo) during manual patch update.</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg bg-primary text-white py-sm rounded-lg font-bold text-sm hover:brightness-110 transition-all flex items-center justify-center gap-md">
+<span class="material-symbols-outlined text-sm">construction</span> Deploy Hotfix
+                            </button>
+</div>
+</div>
+<!-- Incident Kanban (Vertical List) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm flex-1 flex flex-col">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-title-md text-title-md">Incident Tracker</h3>
+<button class="p-xs bg-surface-container rounded border border-outline-variant hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">add</span>
+</button>
+</div>
+<div class="p-lg flex-1 overflow-y-auto space-y-md">
+<!-- New Incident -->
+<div class="p-md rounded-lg border-l-4 border-error bg-surface-container shadow-sm group cursor-pointer hover:translate-x-1 transition-transform">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[10px] font-black tracking-widest text-error">URGENT</span>
+<span class="text-[10px] text-on-surface-variant">2m ago</span>
+</div>
+<p class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">INC-2024-0082: SJC Core Flap</p>
+<p class="text-xs text-on-surface-variant mt-xs">Assigned: AI Auto-Pilot</p>
+<div class="flex items-center gap-xs mt-md">
+<span class="material-symbols-outlined text-xs text-outline">account_circle</span>
+<span class="text-[10px] text-outline">Network Eng. 01</span>
+</div>
+</div>
+<!-- In Progress Incident -->
+<div class="p-md rounded-lg border-l-4 border-primary bg-surface-container shadow-sm group cursor-pointer hover:translate-x-1 transition-transform">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[10px] font-black tracking-widest text-primary">IN PROGRESS</span>
+<span class="text-[10px] text-on-surface-variant">45m ago</span>
+</div>
+<p class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">INC-2024-0079: BGP Route Leak</p>
+<p class="text-xs text-on-surface-variant mt-xs">Verifying prefix-lists on Edge Router 02.</p>
+<div class="flex items-center gap-xs mt-md">
+<span class="material-symbols-outlined text-xs text-outline">account_circle</span>
+<span class="text-[10px] text-outline">Network Eng. 04</span>
+</div>
+</div>
+<!-- Resolved Incident -->
+<div class="p-md rounded-lg border-l-4 border-green-500 bg-surface-container opacity-60 group cursor-pointer hover:opacity-100 transition-all">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-[10px] font-black tracking-widest text-green-600">RESOLVED</span>
+<span class="text-[10px] text-on-surface-variant">3h ago</span>
+</div>
+<p class="text-sm font-bold text-on-surface">INC-2024-0075: Auth Timeout</p>
+<p class="text-xs text-on-surface-variant mt-xs">Radius server failover successful.</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-lg right-lg z-50">
+<button class="w-14 h-14 bg-primary text-white rounded-full shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all group overflow-hidden">
+<div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity">
+
+</div>
+<span class="material-symbols-outlined text-2xl relative z-10">psychology</span>
+</button>
+</div>
+<script>
+        // Micro-interaction for Log Stream simulation
+        const logContainer = document.querySelector('.log-stream-container');
+        setInterval(() => {
+            // Optional: Subtle UI behavior like auto-scrolling or fading in new logs
+        }, 5000);
+
+        // Navigation state logic
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // For demo purposes, we don't actually navigate
+                // But we could toggle active classes here
+            });
+        });
+    </script>
+</body></html>

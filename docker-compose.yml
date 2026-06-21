@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: netmind-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - netmind-network
+
+  ai-service:
+    build:
+      context: ./ai_service
+    container_name: netmind-ai-service
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - netmind-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: netmind-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongodb:27017/netmind-ai
+      - JWT_SECRET=super_secret_netmind_jwt_key_123
+      - JWT_REFRESH_SECRET=super_secret_netmind_jwt_refresh_key_999
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - mongodb
+      - ai-service
+    networks:
+      - netmind-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: netmind-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - netmind-network
+
+volumes:
+  mongo-data:
+
+networks:
+  netmind-network:
+    driver: bridge

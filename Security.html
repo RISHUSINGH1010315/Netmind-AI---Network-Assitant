@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NetMind AI - Security Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c3c6d6",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001848",
+                    "on-primary-container": "#c4d2ff",
+                    "on-secondary-fixed": "#0b1c30",
+                    "background": "#f9f9ff",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "secondary-container": "#d0e1fb",
+                    "surface": "#f9f9ff",
+                    "error": "#ba1a1a",
+                    "tertiary": "#404445",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "inverse-surface": "#263143",
+                    "on-surface-variant": "#434654",
+                    "on-surface": "#111c2d",
+                    "on-tertiary-fixed": "#191c1e",
+                    "surface-container-low": "#f0f3ff",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "primary-container": "#0052cc",
+                    "secondary": "#505f76",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#d8e3fb",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "primary": "#003d9b",
+                    "primary-fixed": "#dae2ff",
+                    "surface-container-high": "#dee8ff",
+                    "inverse-on-surface": "#ecf1ff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#e7eeff",
+                    "surface-dim": "#cfdaf2",
+                    "secondary-fixed": "#d3e4fe",
+                    "inverse-primary": "#b2c5ff",
+                    "outline": "#737685",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary-container": "#d1d3d5",
+                    "on-secondary-container": "#54647a",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#111c2d",
+                    "surface-tint": "#0c56d0",
+                    "surface-variant": "#d8e3fb",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#585b5d",
+                    "tertiary-fixed": "#e0e3e5",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "2xl": "48px",
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "code-sm": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "title-md": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "code-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "title-md": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #f9f9ff; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #E2E8F0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c3c6d6; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface overflow-x-hidden">
+<!-- SIDE NAVIGATION RAIL -->
+<aside class="fixed top-0 left-0 h-full w-64 bg-surface-container shadow-sm border-r border-outline-variant flex flex-col z-50">
+<div class="px-lg py-xl">
+<h1 class="font-headline-lg text-headline-lg font-black text-primary">NetMind AI</h1>
+<p class="text-on-surface-variant font-body-sm text-body-sm opacity-70">Enterprise Core</p>
+</div>
+<nav class="flex-1 px-sm space-y-1 overflow-y-auto">
+<!-- Navigation Items from JSON -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-sm text-body-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-sm text-body-sm">Inventory</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings_ethernet">settings_ethernet</span>
+<span class="font-body-sm text-body-sm">Config Analyzer</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="lan">lan</span>
+<span class="font-body-sm text-body-sm">VLANs</span>
+</a>
+<!-- Active State: Security Center -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold bg-primary-container/20 border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="font-body-sm text-body-sm">Security</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="error">error</span>
+<span class="font-body-sm text-body-sm">Incidents</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg transition-colors hover:bg-surface-container-highest text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-body-sm text-body-sm">AI Assistant</span>
+</a>
+</nav>
+<div class="p-lg border-t border-outline-variant flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-fixed text-sm">person</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-body-sm text-body-sm font-bold truncate">Network Engineer</p>
+<p class="text-[10px] uppercase tracking-wider text-outline">Level 4 Admin</p>
+</div>
+</div>
+</aside>
+<!-- TOP APP BAR -->
+<header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-lg z-40">
+<div class="flex items-center gap-xl">
+<h2 class="font-title-md text-title-md text-primary font-bold">Security Center</h2>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-all" href="#">Network Map</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-all" href="#">Global Topology</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none rounded-full text-body-sm font-body-sm focus:ring-2 focus:ring-primary/20 w-64 transition-all" placeholder="Search security logs..." type="text"/>
+</div>
+<div class="flex items-center gap-sm ml-4">
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="ml-64 pt-16 min-h-screen p-lg">
+<div class="max-w-container-max mx-auto space-y-lg">
+<!-- BENTO GRID TOP: RISK SCORE & THREAT MAP -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Security Risk Score Card -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col justify-between relative overflow-hidden">
+<div class="z-10">
+<div class="flex justify-between items-start mb-md">
+<h3 class="font-title-md text-title-md text-on-surface">Security Risk Score</h3>
+<span class="px-sm py-xs bg-error-container text-on-error-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Needs Attention</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-display-lg text-display-lg text-error">72</span>
+<span class="text-on-surface-variant font-title-md text-title-md">/ 100</span>
+</div>
+<p class="mt-sm text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                            Your network security posture has declined by <span class="text-error font-bold">4.2%</span> in the last 24 hours due to 2 high-severity vulnerabilities discovered.
+                        </p>
+</div>
+<div class="mt-xl space-y-sm z-10">
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-error w-[72%] transition-all duration-1000"></div>
+</div>
+<div class="flex justify-between text-[11px] font-bold text-outline">
+<span>CRITICAL</span>
+<span>OPTIMAL</span>
+</div>
+</div>
+<!-- Decorative Background Gradient -->
+<div class="absolute -right-12 -bottom-12 w-48 h-48 bg-error/5 rounded-full blur-3xl"></div>
+</div>
+<!-- Threat Map Card -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden h-80 lg:h-auto relative">
+<div class="absolute top-lg left-lg z-20 bg-white/90 backdrop-blur-md p-md rounded-lg shadow-sm border border-outline-variant">
+<h3 class="font-body-sm text-body-sm font-bold flex items-center gap-sm">
+<span class="w-2 h-2 bg-error rounded-full animate-pulse"></span>
+                            Live Threat Map
+                        </h3>
+<p class="text-[11px] text-on-surface-variant">Real-time login attempts worldwide</p>
+</div>
+<!-- Threat Map Placeholder -->
+<div class="w-full h-full min-h-[320px] bg-surface-container-low flex items-center justify-center">
+<div class="w-full h-full opacity-60" data-alt="A clean, minimalist vector-style global world map for a technical network dashboard. The map is rendered in muted slate grays and cool blues, featuring delicate connecting lines and pulsing red nodes representing cybersecurity login attempts. High-contrast, sleek modern enterprise aesthetic with professional lighting and depth." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9YQK438qJ1qnyHdXCOc3rPhwC8cd3ZQF2WLOQgOe4Fv1F4POt1QP9plkhzRIhIZk1eQ6jO4JhwI_CmHZqEcjFPv28mMOvLoYE5va2kFU7Yn6OtyDMTbzNNN4OBssOIvEWg4uyvU8HnJIUW--pQDiCdCNUoX1uWxBA25ym31pFcP2nFxgHZ3LOtNB4CajSXdkW1_IsKs466cytto_nM3VqYNHLcwclZ_KHsLYnu3hAIm79YItrE2aPyjT15rp-K5onSB_PsRdf')"></div>
+<!-- Map Overlays (Animated Pips) -->
+<div class="absolute top-1/3 left-1/4">
+<span class="flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+</span>
+</div>
+<div class="absolute bottom-1/4 right-1/3">
+<span class="flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+</div>
+</div>
+<div class="absolute bottom-lg right-lg bg-surface-container-lowest/80 backdrop-blur-md p-sm border border-outline-variant rounded flex gap-md text-[10px] font-bold">
+<div class="flex items-center gap-xs"><span class="w-2 h-2 bg-error rounded-full"></span> Failed Attempt</div>
+<div class="flex items-center gap-xs"><span class="w-2 h-2 bg-primary rounded-full"></span> Admin Login</div>
+</div>
+</div>
+</div>
+<!-- MIDDLE SECTION: VULNERABILITIES & COMPLIANCE -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Vulnerabilities List -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-surface">Vulnerabilities</h3>
+<span class="text-body-sm font-body-sm text-outline">Detected: 14 total</span>
+</div>
+<div class="divide-y divide-outline-variant">
+<!-- Critical Item -->
+<div class="p-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-start gap-md">
+<div class="mt-1 p-2 bg-error-container text-on-error-container rounded-lg">
+<span class="material-symbols-outlined text-lg" data-icon="security_update_good">security_update_good</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Telnet enabled on 5 devices</h4>
+<span class="text-[11px] font-bold text-error uppercase">High Risk</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+                                        Insecure communication protocol active on core distribution switches. Traffic is unencrypted.
+                                    </p>
+<div class="mt-md flex gap-sm">
+<button class="text-[11px] font-bold px-3 py-1 bg-primary text-white rounded-lg hover:bg-primary-container transition-all">Fix Now</button>
+<button class="text-[11px] font-bold px-3 py-1 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-container-highest transition-all">Details</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Medium Item -->
+<div class="p-lg hover:bg-surface-container-low transition-colors group">
+<div class="flex items-start gap-md">
+<div class="mt-1 p-2 bg-secondary-container text-on-secondary-container rounded-lg">
+<span class="material-symbols-outlined text-lg" data-icon="password">password</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Default passwords in use on switch-floor-2</h4>
+<span class="text-[11px] font-bold text-on-secondary-container uppercase">Medium Risk</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+                                        Switch `IDF-2-SW-01` is using factory default credentials for the SSH management console.
+                                    </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Compliance Score Card -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container-lowest rounded-xl border border-outline-variant p-lg">
+<h3 class="font-title-md text-title-md text-on-surface mb-lg">Compliance Overview</h3>
+<div class="space-y-xl">
+<!-- Benchmark 1 -->
+<div class="space-y-sm">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[12px] font-black text-primary uppercase tracking-widest">CIS Benchmark v2.0</p>
+<p class="font-body-md text-body-md font-bold mt-xs">Enterprise Compliance</p>
+</div>
+<span class="font-display-lg text-display-lg text-primary opacity-20">85%</span>
+</div>
+<div class="h-4 w-full bg-surface-container-highest rounded-full overflow-hidden relative">
+<div class="h-full bg-primary w-[85%] rounded-full shadow-lg"></div>
+<div class="absolute inset-0 flex items-center justify-end pr-4 text-[10px] font-bold text-on-surface/50">15% Gap</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="p-md rounded-xl bg-surface-container-low border border-outline-variant">
+<p class="text-[10px] font-bold text-outline uppercase">Passed Checks</p>
+<p class="font-headline-lg text-headline-lg font-bold text-on-surface">112</p>
+</div>
+<div class="p-md rounded-xl bg-surface-container-low border border-outline-variant">
+<p class="text-[10px] font-bold text-outline uppercase">Failed Checks</p>
+<p class="font-headline-lg text-headline-lg font-bold text-error">19</p>
+</div>
+</div>
+<div class="p-md border border-dashed border-outline-variant rounded-xl flex items-center justify-between">
+<span class="text-body-sm font-body-sm text-on-surface-variant">SOC2 Type II Readiness</span>
+<span class="px-2 py-1 bg-surface-container text-[11px] font-bold rounded">Analyzing...</span>
+</div>
+</div>
+</div>
+</div>
+<!-- AI RECOMMENDED ACTION - HERO CALLOUT -->
+<div class="bg-primary text-white rounded-2xl p-lg flex flex-col md:flex-row items-center justify-between gap-lg relative overflow-hidden shadow-xl">
+<!-- Decorative Shader Placeholder Background -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+
+</div>
+<div class="z-10 flex flex-col md:flex-row items-center gap-lg max-w-2xl">
+<div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-4xl" data-icon="auto_fix_high" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+</div>
+<div class="text-center md:text-left">
+<h3 class="font-headline-lg text-headline-lg font-bold mb-xs">Auto-Remediate Vulnerabilities</h3>
+<p class="text-primary-fixed-dim font-body-md text-body-md">
+                            NetMind AI recommends disabling Telnet across all 5 identified devices and automatically enabling SSH v2 with RSA 4096-bit keys.
+                        </p>
+</div>
+</div>
+<div class="z-10 flex gap-md shrink-0">
+<button class="px-xl py-md bg-white text-primary font-bold rounded-xl hover:bg-primary-fixed-dim transition-all shadow-lg active:scale-95">
+                        Execute Action
+                    </button>
+<button class="p-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- INCIDENT TIMELINE / LOGS -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-surface">Recent Security Events</h3>
+<div class="flex gap-sm">
+<button class="px-sm py-1 border border-outline-variant rounded-md text-[11px] font-bold hover:bg-surface-container">All Logs</button>
+<button class="px-sm py-1 border border-outline-variant rounded-md text-[11px] font-bold hover:bg-surface-container">Export CSV</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead class="bg-surface-container-low text-on-surface-variant">
+<tr>
+<th class="px-lg py-sm font-bold">Timestamp</th>
+<th class="px-lg py-sm font-bold">Event Type</th>
+<th class="px-lg py-sm font-bold">Source Asset</th>
+<th class="px-lg py-sm font-bold">Severity</th>
+<th class="px-lg py-sm font-bold">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-background transition-colors">
+<td class="px-lg py-md text-outline font-code-sm text-code-sm">2023-10-27 14:22:10</td>
+<td class="px-lg py-md font-bold">Brute Force Attempt</td>
+<td class="px-lg py-md">Core-Gateway-NYC</td>
+<td class="px-lg py-md">
+<span class="px-2 py-0.5 bg-error-container text-on-error-container text-[10px] font-bold rounded">CRITICAL</span>
+</td>
+<td class="px-lg py-md flex items-center gap-xs">
+<span class="w-2 h-2 bg-primary rounded-full"></span> Blocked
+                                </td>
+</tr>
+<tr class="hover:bg-background transition-colors">
+<td class="px-lg py-md text-outline font-code-sm text-code-sm">2023-10-27 14:18:45</td>
+<td class="px-lg py-md font-bold">Config Drift Detected</td>
+<td class="px-lg py-md">switch-floor-2</td>
+<td class="px-lg py-md">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded">MEDIUM</span>
+</td>
+<td class="px-lg py-md flex items-center gap-xs">
+<span class="w-2 h-2 bg-outline rounded-full"></span> Pending Review
+                                </td>
+</tr>
+<tr class="hover:bg-background transition-colors">
+<td class="px-lg py-md text-outline font-code-sm text-code-sm">2023-10-27 13:55:02</td>
+<td class="px-lg py-md font-bold">Unauthorized Port Scan</td>
+<td class="px-lg py-md">WAP-Lobby-01</td>
+<td class="px-lg py-md">
+<span class="px-2 py-0.5 bg-error-container text-on-error-container text-[10px] font-bold rounded">CRITICAL</span>
+</td>
+<td class="px-lg py-md flex items-center gap-xs">
+<span class="w-2 h-2 bg-primary rounded-full"></span> Mitigated
+                                </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- FLOATING CHAT TOGGLE (AI ASSISTANT) -->
+<button class="fixed bottom-lg right-lg w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center group hover:scale-110 transition-transform z-50">
+<span class="material-symbols-outlined text-3xl" data-icon="psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="absolute right-full mr-4 px-3 py-1.5 bg-inverse-surface text-inverse-on-surface text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Ask AI Assistant
+        </span>
+</button>
+<script>
+        // Micro-interactions for risk score circle or animations
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("NetMind AI Security Center initialized.");
+        });
+    </script>
+</body></html>

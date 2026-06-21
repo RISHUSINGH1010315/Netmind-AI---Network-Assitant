@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NetMind AI Assistant</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c3c6d6",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001848",
+                    "on-primary-container": "#c4d2ff",
+                    "on-secondary-fixed": "#0b1c30",
+                    "background": "#f9f9ff",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "secondary-container": "#d0e1fb",
+                    "surface": "#f9f9ff",
+                    "error": "#ba1a1a",
+                    "tertiary": "#404445",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "inverse-surface": "#263143",
+                    "on-surface-variant": "#434654",
+                    "on-surface": "#111c2d",
+                    "on-tertiary-fixed": "#191c1e",
+                    "surface-container-low": "#f0f3ff",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "primary-container": "#0052cc",
+                    "secondary": "#505f76",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#d8e3fb",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "primary": "#003d9b",
+                    "primary-fixed": "#dae2ff",
+                    "surface-container-high": "#dee8ff",
+                    "inverse-on-surface": "#ecf1ff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#e7eeff",
+                    "surface-dim": "#cfdaf2",
+                    "secondary-fixed": "#d3e4fe",
+                    "inverse-primary": "#b2c5ff",
+                    "outline": "#737685",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary-container": "#d1d3d5",
+                    "on-secondary-container": "#54647a",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#111c2d",
+                    "surface-tint": "#0c56d0",
+                    "surface-variant": "#d8e3fb",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#585b5d",
+                    "tertiary-fixed": "#e0e3e5",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "2xl": "48px",
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "code-sm": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "title-md": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                    "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                    "code-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                    "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                    "title-md": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .chat-container { height: calc(100vh - 128px); }
+        .glass-panel { backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.7); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary/20">
+<!-- SideNavBar (rail_persistent) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container dark:bg-surface-container-high shadow-sm flex flex-col border-r border-outline-variant z-50">
+<div class="p-lg">
+<h1 class="font-headline-lg text-headline-lg font-black text-primary">NetMind AI</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Enterprise Core</p>
+</div>
+<nav class="flex-1 overflow-y-auto py-md scrollbar-hide">
+<ul class="space-y-1">
+<!-- Navigation Tabs from JSON -->
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-sm">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-sm">Inventory</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings_ethernet">settings_ethernet</span>
+<span class="font-body-sm">Config Analyzer</span>
+</a>
+</li>
+<!-- ... other items omitted for brevity but logic applied ... -->
+<li>
+<a class="flex items-center gap-md px-lg py-md text-primary font-bold bg-primary-container/20 border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-body-sm">AI Assistant</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="lan">lan</span>
+<span class="font-body-sm">VLANs</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="router">router</span>
+<span class="font-body-sm">Routing</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+<span class="font-body-sm">Interfaces</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="security_update_good">security_update_good</span>
+<span class="font-body-sm">ACLs</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings_input_antenna">settings_input_antenna</span>
+<span class="font-body-sm">DHCP/DNS</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-sm">Logs</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="font-body-sm">Security</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="error">error</span>
+<span class="font-body-sm">Incidents</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="p-md border-t border-outline-variant">
+<div class="flex items-center gap-sm bg-surface-container-highest p-sm rounded-lg">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs">
+                    NE
+                </div>
+<div class="overflow-hidden">
+<p class="font-label-caps text-on-surface text-xs truncate">Eng. Alex Rivera</p>
+<p class="text-[10px] text-on-surface-variant opacity-60 truncate">L3 Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopAppBar (large) -->
+<header class="fixed top-0 right-0 left-64 bg-surface-container-lowest border-b border-outline-variant z-40 flex justify-between items-center px-lg py-md">
+<div class="flex items-center gap-lg">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary/20 w-80 font-body-sm transition-all" placeholder="Search network assets..." type="text"/>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-title-md text-on-surface-variant hover:text-primary transition-all" href="#">Network Map</a>
+<a class="font-title-md text-on-surface-variant hover:text-primary transition-all" href="#">Global Topology</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface-container-lowest"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a network engineer in a modern corporate setting with subtle blue backlighting and high-end photographic quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChY13XzMxYGTIjIq8HWJJUFC85Xg6hC6Uk3w12z6LQTtOUKZG9kRXLZL49Lf-Uis95FAYHdhYKitiwYYtEAxaNtShi0oLXsGloL1kHzFG23gjj5LrivGUufy_xbq--398vE6PeJiTsuxSjfVjkWISkzBpLLObMmVq1rXd_t0LeD0lhfguQQ1Tyk4bZsZZTqjz3YD8Q5eRLDj6VqvOSQQhDXMUxYECStA4uFdH0r_wcJgVNjFe_AfCVsERShoXdnsmRwtcX60l-"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 mt-16 flex flex-col md:flex-row min-h-[calc(100vh-64px)] overflow-hidden">
+<!-- Chat Canvas -->
+<section class="flex-1 flex flex-col bg-surface-container-low/50 relative">
+<!-- Chat Header -->
+<div class="px-xl py-lg border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h2 class="font-title-md text-on-surface">Network Intelligence Core</h2>
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+<span class="text-[11px] font-label-caps text-on-surface-variant opacity-70 uppercase tracking-widest">System Active • High Fidelity</span>
+</div>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-md py-1.5 rounded-lg border border-outline-variant font-body-sm text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="history">history</span>
+                        History
+                    </button>
+<button class="flex items-center gap-xs px-md py-1.5 rounded-lg border border-outline-variant font-body-sm text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                        Clear
+                    </button>
+</div>
+</div>
+<!-- Message Thread -->
+<div class="flex-1 overflow-y-auto p-xl space-y-xl chat-container scrollbar-hide">
+<!-- System Greeting -->
+<div class="flex gap-lg items-start max-w-4xl">
+<div class="w-10 h-10 shrink-0 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="space-y-md">
+<div class="bg-surface-container-lowest p-lg rounded-2xl shadow-sm border border-outline-variant/30">
+<p class="font-body-md text-on-surface leading-relaxed">
+                                Hello Engineer Rivera. I've finished indexing the latest topology changes in <span class="font-bold text-primary">Region-US-East-1</span>. 
+                                I'm detecting a 14% latency spike on the OSPF backbone. How can I assist you with the diagnostic flow?
+                            </p>
+</div>
+<!-- Suggested Questions -->
+<div class="flex flex-wrap gap-sm">
+<button class="px-md py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-body-sm hover:bg-primary/10 transition-colors">
+                                Why is OSPF failing on R2?
+                            </button>
+<button class="px-md py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-body-sm hover:bg-primary/10 transition-colors">
+                                Explain my VLAN configuration
+                            </button>
+<button class="px-md py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-body-sm hover:bg-primary/10 transition-colors">
+                                How do I secure my SSH access?
+                            </button>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-lg items-start justify-end max-w-4xl ml-auto">
+<div class="bg-primary text-on-primary p-lg rounded-2xl shadow-md font-body-md max-w-2xl">
+                        Identify the cause of the BGP flap on Edge-Router-04. Show me the relevant log entries and provide a remediation script.
+                    </div>
+<div class="w-10 h-10 shrink-0 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+</div>
+<!-- AI Complex Response -->
+<div class="flex gap-lg items-start max-w-5xl">
+<div class="w-10 h-10 shrink-0 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="flex-1 space-y-lg">
+<div class="bg-surface-container-lowest p-xl rounded-2xl shadow-sm border border-outline-variant/30 space-y-lg">
+<!-- Analysis Header -->
+<div class="flex items-center gap-md border-b border-outline-variant pb-md">
+<span class="px-sm py-1 bg-error-container text-error text-[10px] font-bold rounded uppercase tracking-tighter">Severity: Critical</span>
+<p class="font-title-md text-on-surface">Analysis: BGP State Flapping</p>
+</div>
+<p class="font-body-md text-on-surface leading-relaxed">
+                                Diagnostic scan of <span class="font-code-sm text-primary">Edge-Router-04</span> reveals a HoldTimer expiration on Peer <span class="font-code-sm text-primary">172.16.4.1</span>. 
+                                The root cause is an MTU mismatch on the physical interface <span class="font-code-sm font-bold">Gi0/0/1</span> resulting in fragmented keepalive packets being dropped by the transit firewall.
+                            </p>
+<!-- Data Table Snippet -->
+<div class="rounded-lg border border-outline-variant overflow-hidden">
+<table class="w-full text-left font-body-sm">
+<thead class="bg-surface-container-low text-on-surface-variant uppercase text-[11px] font-bold">
+<tr>
+<th class="px-md py-2">Timestamp</th>
+<th class="px-md py-2">Source</th>
+<th class="px-md py-2">Event</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-md py-2 font-code-sm">14:22:01.04</td>
+<td class="px-md py-2">BGP-5-ADJCHANGE</td>
+<td class="px-md py-2 text-error">Neighbor 172.16.4.1 Down: Hold Timer Expired</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-md py-2 font-code-sm">14:21:44.22</td>
+<td class="px-md py-2">IFNET-3-MTU_ERR</td>
+<td class="px-md py-2">Packet (1524) exceeds MTU on Gi0/0/1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Code Block -->
+<div class="space-y-sm">
+<p class="font-label-caps text-on-surface-variant uppercase text-xs">Remediation Script (Cisco IOS-XE)</p>
+<div class="bg-tertiary-container text-on-tertiary-container p-lg rounded-xl font-code-sm overflow-x-auto relative group">
+<button class="absolute top-2 right-2 p-1.5 rounded bg-white/10 hover:bg-white/20 transition-all opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span>
+</button>
+<pre><code>interface GigabitEthernet0/0/1
+  description WAN_PEER_UPSTREAM
+  mtu 1500
+  ip mtu 1500
+  no shutdown
+exit
+router bgp 65001
+  neighbor 172.16.4.1 description ISP_TRANSIT_A
+  neighbor 172.16.4.1 timers 10 30</code></pre>
+</div>
+</div>
+<!-- Contextual Links -->
+<div class="flex items-center gap-md pt-md">
+<span class="text-xs text-on-surface-variant">Affected Assets:</span>
+<a class="flex items-center gap-xs px-sm py-1 bg-surface-container rounded-md border border-outline-variant hover:border-primary transition-colors text-xs font-bold text-primary" href="#">
+<span class="material-symbols-outlined text-xs" data-icon="router">router</span>
+                                    Edge-Router-04
+                                </a>
+<a class="flex items-center gap-xs px-sm py-1 bg-surface-container rounded-md border border-outline-variant hover:border-primary transition-colors text-xs font-bold text-primary" href="#">
+<span class="material-symbols-outlined text-xs" data-icon="hub">hub</span>
+                                    Nexus-Core-A
+                                </a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-xl bg-surface-container-lowest border-t border-outline-variant glass-panel">
+<div class="max-w-4xl mx-auto relative">
+<div class="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-sm">
+<button class="p-2 hover:bg-surface-container rounded-full text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+</button>
+</div>
+<textarea class="w-full pl-16 pr-32 py-4 bg-surface-container-low border-outline-variant rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none font-body-md transition-all shadow-sm" placeholder="Ask NetMind a network question or paste a config..." rows="1"></textarea>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-sm">
+<div class="flex items-center gap-xs px-md py-2 rounded-lg bg-surface-container-highest text-[10px] font-bold text-primary mr-2">
+                             GPT-4 NETWORK OPTIMIZED
+                        </div>
+<button class="p-2.5 bg-primary text-on-primary rounded-xl shadow-lg hover:bg-primary-container transition-all active:scale-95 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+<p class="text-center text-[11px] text-on-surface-variant mt-md opacity-60">
+                    NetMind AI can make mistakes. Verify critical configuration changes in a staging environment.
+                </p>
+</div>
+</section>
+<!-- Right Sidebar (Context Awareness) -->
+<aside class="w-80 bg-surface-container-lowest border-l border-outline-variant p-xl hidden xl:flex flex-col gap-lg">
+<div class="space-y-md">
+<h3 class="font-label-caps text-on-surface-variant tracking-widest text-xs uppercase">Currently Analyzing</h3>
+<div class="p-lg bg-surface-container-low rounded-2xl border border-outline-variant/50 space-y-md relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl" data-icon="hub">hub</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="dns">dns</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Core-Switch-01</p>
+<p class="text-xs text-on-surface-variant">Catalyst 9500 • IOS-XE</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md pt-md">
+<div class="space-y-1">
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Uptime</p>
+<p class="font-code-sm text-xs">242d 12h</p>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Health</p>
+<p class="font-code-sm text-xs text-green-600">Optimal</p>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-container-highest rounded-lg text-xs font-bold text-primary hover:bg-primary/10 transition-colors">
+                        View Full Telemetry
+                    </button>
+</div>
+</div>
+<div class="space-y-md">
+<h3 class="font-label-caps text-on-surface-variant tracking-widest text-xs uppercase">Insight Stream</h3>
+<ul class="space-y-md">
+<li class="flex gap-md items-start p-md bg-surface-container-low/30 rounded-xl border border-transparent hover:border-outline-variant transition-all cursor-default">
+<span class="material-symbols-outlined text-amber-500 shrink-0" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div class="space-y-1">
+<p class="text-xs font-bold text-on-surface leading-tight">Certificate Expiring</p>
+<p class="text-[11px] text-on-surface-variant">Internal CA cert for 'VPN-Gateway' expires in 14 days.</p>
+</div>
+</li>
+<li class="flex gap-md items-start p-md bg-surface-container-low/30 rounded-xl border border-transparent hover:border-outline-variant transition-all cursor-default">
+<span class="material-symbols-outlined text-primary shrink-0" data-icon="auto_awesome">auto_awesome</span>
+<div class="space-y-1">
+<p class="text-xs font-bold text-on-surface leading-tight">Topology Optimization</p>
+<p class="text-[11px] text-on-surface-variant">Recommended: Enable BFD on Peer 10.0.4.2 to reduce convergence time.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="mt-auto space-y-md">
+<div class="bg-gradient-to-br from-primary to-primary-container p-lg rounded-2xl text-on-primary">
+<p class="font-title-md mb-2">NetMind Premium</p>
+<p class="text-xs opacity-90 mb-md leading-relaxed">Unlock autonomous remediation and predictive failure modeling for your core backbone.</p>
+<button class="w-full py-2 bg-white text-primary rounded-lg text-xs font-bold shadow-md hover:bg-on-primary-container transition-all">
+                        Upgrade Now
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+<!-- FAB (Suppressed based on rules for task-focused page, but contextually relevant for Quick Diagnostics if desired - keeping it off to prioritize canvas) -->
+<script>
+        // Micro-interactions for the chat
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Simulating the AI's "typing" or thinking state if needed
+        function simulateThinking() {
+            // UI logic would go here
+        }
+    </script>
+</body></html>
