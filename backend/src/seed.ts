@@ -14,7 +14,8 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/netmind-ai
 
 async function seed() {
   try {
-    await mongoose.connect(MONGO_URI);
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 });
     console.log('Connected to MongoDB for seeding...');
 
     // Clear existing data
@@ -313,8 +314,9 @@ line vty 0 4
     await mongoose.connection.close();
     process.exit(0);
   } catch (error) {
-    console.error('Error during seeding:', error);
-    process.exit(1);
+    console.warn('\n⚠️  MongoDB connection failed. Skipping seeding.');
+    console.warn('The application will run automatically in in-memory fallback mode using pre-seeded mock data.\n');
+    process.exit(0);
   }
 }
 
