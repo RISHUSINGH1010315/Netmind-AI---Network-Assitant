@@ -41,7 +41,7 @@ You can run the entire environment using Docker Compose (Recommended) or locally
 
 Ensure Docker Desktop and Docker Compose are installed and running.
 
-1.  *(Optional)* Create a `.env` file inside the `ai_service/` folder and insert your LLM API keys:
+1.  *(Optional)* Create a `.env` file at the root of the project (copying `.env.example` in the root) and insert your LLM API keys:
     ```env
     GEMINI_API_KEY=your_gemini_api_key_here
     OPENAI_API_KEY=your_openai_api_key_here
