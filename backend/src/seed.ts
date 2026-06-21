@@ -15,7 +15,7 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/netmind-ai
 async function seed() {
   try {
     console.log('Connecting to MongoDB...');
-    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 });
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 15000 });
     console.log('Connected to MongoDB for seeding...');
 
     // Clear existing data
