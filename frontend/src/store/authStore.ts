@@ -18,7 +18,7 @@ interface AuthState {
 }
 
 // Global Axios configuration
-axios.defaults.baseURL = ''; // proxy takes care of base urls
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || ''; // proxy takes care of base urls in development and docker
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   token: null,

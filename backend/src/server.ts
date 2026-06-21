@@ -49,18 +49,17 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Database connection & Server Boot
+// Start HTTP Server instantly
+app.listen(PORT, () => {
+  console.log(`NetMind Express API server running on port ${PORT}`);
+});
+
+// Database connection in the background
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Successfully connected to MongoDB.');
-    app.listen(PORT, () => {
-      console.log(`NetMind Express API server running on port ${PORT}`);
-    });
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-    console.warn('Database offline. Server will start, but database operations will fail.');
-    app.listen(PORT, () => {
-      console.log(`NetMind Express API server running in fallback mode on port ${PORT}`);
-    });
+    console.warn('Database offline. Server running in in-memory fallback mode.');
   });
